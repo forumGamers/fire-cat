@@ -1,0 +1,39 @@
+syntax = "proto3";
+
+package user;
+
+message User {
+  string id = 1;
+  string fullname = 2;
+  string username = 3;
+  string email = 4;
+  string password = 5;
+  bool is_verified = 6;
+  string bio = 7;
+  string image_url = 8;
+  string image_id = 9;
+  string background_url = 10;
+  string background_id = 11;
+  string status = 12;
+  string created_at = 13;
+  string updated_at = 14;
+  optional string division = 15;
+  optional string role = 16;
+  repeated string following = 17;
+  repeated string followers = 18;
+  string access_token = 19;
+  string token_as = 20;
+}
+
+message UserDatas {
+    repeated User data = 1;
+}
+
+message MultipleUserParams {
+    repeated string ids = 1;
+}
+
+
+service UserService {
+  rpc GetMultipleUser(MultipleUserParams) returns (UserDatas) {}
+}
