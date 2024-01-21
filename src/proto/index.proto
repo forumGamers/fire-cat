@@ -39,9 +39,14 @@ message MultipleUserParams {
 
 message NoArguments {}
 
+message UserParams {
+  string id = 1;
+}
+
 
 service UserService {
   rpc GetMultipleUser(MultipleUserParams) returns (UserDatas) {}
   rpc Me(NoArguments) returns (UserData) {}
   rpc GetFollowingRecomendation(NoArguments) returns (UserDatas) {}
+  rpc GetUserById(UserParams) returns (UserData) {}
 }

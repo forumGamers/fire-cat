@@ -90,4 +90,23 @@ export class UserController {
       ),
     };
   }
+
+  @GrpcMethod(USER_SERVICE, UserServiceMethod.GetUserById)
+  @UseInterceptors(AuthenticationInterceptor)
+  public async findById({ id }: { id: string }) {
+    if (!id)
+      throw new RpcException({
+        code: Status.INVALID_ARGUMENT,
+        message: "id is required",
+      });
+
+    const user = await this.userService.findOneById(id);
+    if (!user.rowLength)
+      throw new RpcException({
+        code: Status.NOT_FOUND,
+        message: "user not found",
+      });
+
+    return { data: user.first() };
+  }
 }
