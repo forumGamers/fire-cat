@@ -27,4 +27,13 @@ export class UserService {
       { prepare: true },
     );
   }
+
+  public async getFollowingRecomendation() {
+    //bisa di refactor nanti
+    return await this.client.execute(
+      `SELECT * FROM users WHERE created_at >= dateOf(now()) - 7d AND created_at <= dateOf(now()) LIMIT 30 ALLOW FILTERING;`,
+      [],
+      { prepare: true },
+    );
+  }
 }

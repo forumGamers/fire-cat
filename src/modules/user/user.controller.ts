@@ -71,4 +71,23 @@ export class UserController {
   public me(_: never, metadata: any) {
     return { data: helpers.getUserFromMetadata(metadata) };
   }
+
+  @GrpcMethod(USER_SERVICE, UserServiceMethod.GetFollowingRecomendation)
+  @UseInterceptors(AuthenticationInterceptor)
+  public async getFollowingRecomendation(_: never, metadata: any) {
+    const user = helpers.getUserFromMetadata(metadata);
+
+    const data = await this.userService.getFollowingRecomendation();
+    if (!data.rowLength)
+      throw new RpcException({
+        code: Status.NOT_FOUND,
+        message: "data not found",
+      });
+
+    return {
+      data: data.rows.filter(
+        (row) => !(user?.following || []).includes(row.id.toString())
+      ),
+    };
+  }
 }
