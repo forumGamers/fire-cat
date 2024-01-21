@@ -26,14 +26,21 @@ message User {
 }
 
 message UserDatas {
-    repeated User data = 1;
+  repeated User data = 1;
+}
+
+message UserData {
+  User data = 1;
 }
 
 message MultipleUserParams {
-    repeated string ids = 1;
+  repeated string ids = 1;
 }
+
+message NoArguments {}
 
 
 service UserService {
   rpc GetMultipleUser(MultipleUserParams) returns (UserDatas) {}
+  rpc Me(NoArguments) returns (UserData) {}
 }

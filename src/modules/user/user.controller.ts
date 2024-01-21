@@ -4,12 +4,14 @@ import { GrpcMethod, RpcException } from "@nestjs/microservices";
 import { UserService } from "./user.service";
 import { Status } from "@grpc/grpc-js/build/src/constants";
 import { AuthenticationInterceptor } from "../../middlewares/authentication.middlewares";
+import helpers from "../../helpers";
+import { UserServiceMethod } from "../../enum/services.enum";
 
 @Controller()
 export class UserController {
   constructor(private readonly userService: UserService) {}
 
-  @GrpcMethod(USER_SERVICE, "GetMultipleUser")
+  @GrpcMethod(USER_SERVICE, UserServiceMethod.GetMultipleUser)
   @UseInterceptors(AuthenticationInterceptor)
   public async getMultipleUser({ ids }: { ids: string[] }, metadata: any) {
     if (!ids || !ids.length)
@@ -42,7 +44,7 @@ export class UserController {
         message: "ids is not valid",
       });
 
-    const user = metadata.get("user")[0];
+    const user = helpers.getUserFromMetadata(metadata);
     const users = await this.userService.getMultipleUserByIds(data);
     if (!users.rowLength)
       throw new RpcException({
@@ -62,5 +64,11 @@ export class UserController {
             : false,
       })),
     };
+  }
+
+  @GrpcMethod(USER_SERVICE, UserServiceMethod.Me)
+  @UseInterceptors(AuthenticationInterceptor)
+  public me(_: never, metadata: any) {
+    return { data: helpers.getUserFromMetadata(metadata) };
   }
 }

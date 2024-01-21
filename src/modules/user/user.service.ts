@@ -14,7 +14,7 @@ export class UserService {
       {
         prepare: true,
       },
-    )) as types.ResultSet & { rows: types.Row & user };
+    )) as types.ResultSet & { rows: (types.Row & user)[] };
   }
 
   public async getMultipleUserByIds(ids: string[]) {
