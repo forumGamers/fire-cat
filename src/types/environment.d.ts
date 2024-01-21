@@ -4,7 +4,8 @@ export declare global {
       APPLICATION_URL: string;
       CASSANDRA_USERNAME: string;
       CASSANDRA_PASSWORD: string;
-      SECRET:strings
+      SECRET: string;
+      RABBIT_MQ_URL: string;
     }
   }
 }

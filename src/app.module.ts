@@ -3,6 +3,8 @@ import { config } from "dotenv";
 import { UserModule } from "./modules/user/user.module";
 import { CassandraModule } from "@mich4l/nestjs-cassandra";
 import { join } from "path";
+import { ConsumerService } from "./services/broker.service";
+import { UserService } from "./modules/user/user.service";
 
 config();
 
@@ -24,6 +26,6 @@ config();
     UserModule,
   ],
   controllers: [],
-  providers: [],
+  providers: [ConsumerService, UserService],
 })
 export class AppModule {}
