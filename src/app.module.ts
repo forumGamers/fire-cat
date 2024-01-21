@@ -1,19 +1,27 @@
 import { Module } from "@nestjs/common";
-import { ClientsModule } from "@nestjs/microservices";
 import { config } from "dotenv";
-import { USER_PACKAGE } from "./constants/proto.constant";
-import { grpcClientOptions } from "./config/grpc.config";
+import { UserModule } from "./modules/user/user.module";
+import { CassandraModule } from "@mich4l/nestjs-cassandra";
+import { join } from "path";
 
 config();
 
 @Module({
   imports: [
-    ClientsModule.register([
-      {
-        name: USER_PACKAGE,
-        ...grpcClientOptions,
+    CassandraModule.forRoot({
+      keyspace: "user_service",
+      credentials: {
+        username: process.env.CASSANDRA_USERNAME,
+        password: process.env.CASSANDRA_PASSWORD,
       },
-    ]),
+      cloud: {
+        secureConnectBundle: join(
+          __dirname,
+          "../connection/secure-connect-forum-gamers-testing.zip"
+        ),
+      },
+    }),
+    UserModule,
   ],
   controllers: [],
   providers: [],

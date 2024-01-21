@@ -9,6 +9,6 @@ export const grpcClientOptions: ClientOptions = {
   options: {
     package: 'user',
     protoPath: join(__dirname, '../proto/index.proto'),
-    url: process.env.APPLICATION_URL ?? 'http://localhost:50050',
+    url: process.env.APPLICATION_URL ?? 'localhost:50050',
   },
 };
