@@ -4,6 +4,7 @@ import { Injectable } from '@nestjs/common';
 import { config } from 'dotenv';
 import { UserService } from '../modules/user/user.service';
 import type IUser from '../interfaces';
+import encryption from '../utils/encryption';
 
 config();
 
@@ -39,6 +40,8 @@ export class ConsumerService {
               const user: IUser = JSON.parse(msg.content.toString());
 
               user.created_at = new Date(user.created_at);
+              user.email = encryption.encrypt(user.email)
+              user.username = encryption.encrypt(user.username)
               user.updated_at = new Date(user.updated_at);
               user.division = '' as any;
               user.role = '' as any;
@@ -106,7 +109,7 @@ export class ConsumerService {
               const data: IUser = JSON.parse(msg.content.toString());
               await this.userService.updateUserInfo(
                 data.id,
-                data.username,
+                encryption.encrypt(data.username),
                 data.bio,
               );
               channel.ack(msg);

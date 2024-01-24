@@ -9,6 +9,7 @@ import { RpcException } from '@nestjs/microservices';
 import { type Observable } from 'rxjs';
 import { UserService } from '../modules/user/user.service';
 import jwt from '../utils/jwt.utils';
+import encryption from '../utils/encryption';
 
 @Injectable()
 export class AuthenticationInterceptor implements NestInterceptor {
@@ -35,7 +36,12 @@ export class AuthenticationInterceptor implements NestInterceptor {
         message: 'missing or invalid token',
       });
 
-    metadata.set('user', user.rows[0]);
+    const data = user.rows[0];
+    metadata.set('user', {
+      ...data,
+      email: encryption.decrypt(data.email),
+      username: encryption.decrypt(data.username),
+    });
     metadata.set('loggedAs', loggedAs);
 
     return next.handle().pipe();

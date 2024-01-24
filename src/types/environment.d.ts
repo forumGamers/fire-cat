@@ -6,6 +6,7 @@ export declare global {
       CASSANDRA_PASSWORD: string;
       SECRET: string;
       RABBIT_MQ_URL: string;
+      ENCRYPTION_KEY: string;
     }
   }
 }

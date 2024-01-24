@@ -6,6 +6,8 @@ import { Status } from "@grpc/grpc-js/build/src/constants";
 import { AuthenticationInterceptor } from "../../middlewares/authentication.middlewares";
 import helpers from "../../helpers";
 import { UserServiceMethod } from "../../enum/services.enum";
+import encryption from "../../utils/encryption";
+import { Metadata } from "@grpc/grpc-js";
 
 @Controller()
 export class UserController {
@@ -13,7 +15,7 @@ export class UserController {
 
   @GrpcMethod(USER_SERVICE, UserServiceMethod.GetMultipleUser)
   @UseInterceptors(AuthenticationInterceptor)
-  public async getMultipleUser({ ids }: { ids: string[] }, metadata: any) {
+  public async getMultipleUser({ ids }: { ids: string[] }, metadata: Metadata) {
     if (!ids || !ids.length)
       throw new RpcException({
         code: Status.INVALID_ARGUMENT,
@@ -55,6 +57,8 @@ export class UserController {
     return {
       data: users.rows.map((el) => ({
         ...el,
+        email: encryption.decrypt(el.email),
+        username: encryption.decrypt(el.username),
         isFollowing:
           el.followers &&
           el.followers.length &&
@@ -68,13 +72,13 @@ export class UserController {
 
   @GrpcMethod(USER_SERVICE, UserServiceMethod.Me)
   @UseInterceptors(AuthenticationInterceptor)
-  public me(_: never, metadata: any) {
+  public me(_: never, metadata: Metadata) {
     return { data: helpers.getUserFromMetadata(metadata) };
   }
 
   @GrpcMethod(USER_SERVICE, UserServiceMethod.GetFollowingRecomendation)
   @UseInterceptors(AuthenticationInterceptor)
-  public async getFollowingRecomendation(_: never, metadata: any) {
+  public async getFollowingRecomendation(_: never, metadata: Metadata) {
     const user = helpers.getUserFromMetadata(metadata);
 
     const data = await this.userService.getFollowingRecomendation();
@@ -85,9 +89,13 @@ export class UserController {
       });
 
     return {
-      data: data.rows.filter(
-        (row) => !(user?.following || []).includes(row.id.toString())
-      ),
+      data: data.rows
+        .filter((row) => !(user?.following || []).includes(row.id.toString()))
+        .map((el) => ({
+          ...el,
+          email: encryption.decrypt(el.email),
+          username: encryption.decrypt(el.username),
+        })),
     };
   }
 
@@ -107,6 +115,13 @@ export class UserController {
         message: "user not found",
       });
 
-    return { data: user.first() };
+    const data = user.first();
+    return {
+      data: {
+        ...data,
+        email: encryption.decrypt(data.email),
+        username: encryption.decrypt(data.username),
+      },
+    };
   }
 }
